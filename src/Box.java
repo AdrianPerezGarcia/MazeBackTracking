@@ -1,15 +1,37 @@
 public class Box {
 	
+	private int i;
+	
+	private int j;
+	
 	private int value;
 	
 	private boolean visited;
 	
-	boolean prize;
+	private boolean prize;
 	
-	public Box(int value, boolean prize) {
+	public Box(int i, int j, int value, boolean prize) {
 		this.value = value;
+		this.i = i;
+		this.j = j;
 		this.prize = prize;
 		visited= false;
+	}
+	
+	public int getI() {
+		return i;
+	}
+
+	public void setI(int i) {
+		this.i = i;
+	}
+
+	public int getJ() {
+		return j;
+	}
+
+	public void setJ(int j) {
+		this.j = j;
 	}
 
 	public boolean isVisited() {

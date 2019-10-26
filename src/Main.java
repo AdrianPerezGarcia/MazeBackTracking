@@ -10,7 +10,7 @@ public class Main {
 		Scanner sc = new Scanner(System.in);
 		int tam = sc.nextInt();
 		sc.nextLine();
-		int pI, pJ;
+		int pI = 0, pJ = 0;
 		boolean isTherePrize = false;
 		Box[][] board = new Box[tam][tam];
 		char[][] entryM = new char[tam][tam];
@@ -23,158 +23,41 @@ public class Main {
 					isTherePrize = true;
 					pI = i;
 					pJ = j;
+					board[i][j] = new Box(i, j, 0, true);
 				}
-			}
-		}
-
-		boolean[] movements = { false, false, false, false, false, false, false, false };
-		int checkI, checkJ;
-		for (int i = 0; i < board.length; i++) {
-			for (int j = 0; j < board.length; j++) {
-				int[][] posibleMovements = { { -1, 0 }, { 1, 0 }, { 0, -1 }, { 0, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 },
-						{ 1, 1 } };
-				for (int k = 0; k < movements.length; k++) {
-					checkJ = j + posibleMovements[k][0];
-					checkI = i + posibleMovements[k][1];
-					if (isInBounds(checkI, checkJ, board)
-							&& (entryM[checkI][checkJ] == '0' || entryM[checkI][checkJ] == '*')) {
-						movements[k] = true;
-					}
-				}
-				if (entryM[i][j] == '*') {
-					board[i][j] = new Box(i, j, true, movements);
-					// System.out.println("Se crea la box [" + i + "][" + j + "]");
-				} else {
-					board[i][j] = new Box(i, j, false, movements);
-					// System.out.println("Se crea la box [" + i + "][" + j + "]");
+				else {
+					board[i][j] = new Box(i, j, Integer.parseInt(Character.toString(entryM[i][j])), false);
 				}
 			}
 		}
 		
-		Maze maze = new Maze(board);
-		ArrayList<Box> road = new ArrayList<>();
-		road.add(board[0][0]);
-		if (isTherePrize) {
-			System.out.println("Hay premio");
-		} else {
-			fillRoads(maze, board[0][0], board[board.length - 1][board.length - 1], road);
-			if (road.size() == 0) {
-				System.out.println("NO");
+		if(!(board[0][0].getValue() == 1 || board[board.length-1][board.length-1].getValue() == 1)) {
+			Maze maze = new Maze(board);
+			
+			if (isTherePrize) {
+				searchWithPrize(maze,board,pI,pJ);
+				
 			} else {
-				System.out.println("Longitud del array de arrays: " +maze.getRoads().size());
-				printResult(maze.getShortestRoad());
+				searchWithoutPrize(maze);
 			}
+		} else {
+			System.out.println("NO.");
 		}
+		
 		sc.close();
 	}
 
-	private static boolean isInBounds(int checkI, int checkJ, Box[][] board) {
-		return (checkI >= 0 && checkI < board.length && checkJ >= 0 && checkJ < board.length);
+	private static void searchWithPrize(Maze maze, Box[][] board, int pI, int pJ) {
+		
 	}
 
-	private static void fillRoads(Maze maze, Box actualBox, Box finalBox, ArrayList<Box> road) {
-
-		if (actualBox.equals(finalBox)) {
-			maze.addRoad(road);
-			road.clear();
-			road.add(maze.getBoxAt(0, 0));
-		} else {
-			int[][] movements = { { -1, 0 }, { 0, 1 }, { 1, 0 }, { 0, -1 }, { -1, -1 }, { -1, 1 }, { 1, -1 },
-					{ 1, 1 } };
-			int newJ, newI;
-			Box auxBox;
-
-			for (int i = 0; i < movements.length; i++) {
-				newI = actualBox.getI() + movements[i][0];
-				newJ = actualBox.getJ() + movements[i][1];
-				// System.out.println(newI+","+newJ);
-				auxBox = maze.getBoxAt(newI, newJ);
-
-				switch (i) {
-				case 0:
-					if (maze.canGoUp(actualBox, auxBox)) {
-						road.add(auxBox);
-						actualBox.setVisited(true);
-						fillRoads(maze, auxBox, finalBox, road);
-						actualBox.setVisited(false);
-						road.remove(auxBox);
-					}
-					break;
-				case 1:
-					if (maze.canGoDown(actualBox, auxBox)) {
-						road.add(auxBox);
-						actualBox.setVisited(true);
-						fillRoads(maze, auxBox, finalBox, road);
-						actualBox.setVisited(false);
-						road.remove(auxBox);
-					}
-					break;
-				case 2:
-					if (maze.canGoLeft(actualBox, auxBox)) {
-						road.add(auxBox);
-						actualBox.setVisited(true);
-						fillRoads(maze, auxBox, finalBox, road);
-						actualBox.setVisited(false);
-						road.remove(auxBox);
-					}
-					break;
-				case 3:
-					if (maze.canGoRight(actualBox, auxBox)) {
-						road.add(auxBox);
-						actualBox.setVisited(true);
-						fillRoads(maze, auxBox, finalBox, road);
-						actualBox.setVisited(false);
-						road.remove(auxBox);
-					}
-					break;
-				case 4:
-					if (maze.canGoUpLeft(actualBox, auxBox)) {
-						road.add(auxBox);
-						actualBox.setVisited(true);
-						fillRoads(maze, auxBox, finalBox, road);
-						actualBox.setVisited(false);
-						road.remove(auxBox);
-					}
-					break;
-				case 5:
-					if (maze.canGoUpRight(actualBox, auxBox)) {
-						road.add(auxBox);
-						actualBox.setVisited(true);
-						fillRoads(maze, auxBox, finalBox, road);
-						actualBox.setVisited(false);
-						road.remove(auxBox);
-					}
-					break;
-				case 6:
-					if (maze.canGoDownLeft(actualBox, auxBox)) {
-						road.add(auxBox);
-						actualBox.setVisited(true);
-						fillRoads(maze, auxBox, finalBox, road);
-						actualBox.setVisited(false);
-						road.remove(auxBox);
-					}
-					break;
-				case 7:
-					if (maze.canGoDownRight(actualBox, auxBox)) {
-						road.add(auxBox);
-						actualBox.setVisited(true);
-						fillRoads(maze, auxBox, finalBox, road);
-						actualBox.setVisited(false);
-						road.remove(auxBox);
-					}
-					break;
-				}
-			}
-
+	private static void searchWithoutPrize(Maze maze) {
+		if(maze.resolveMaze(maze.getBoxAt(0, 0), maze.getBoxAt(maze.length-1, maze.length-1))) {
+			System.out.println("Tiene solucion, a ver como la imprimo xd");
 		}
-	}
-
-	private static void printResult(Box[] solution) {
-		for (int i = 0; i < solution.length; i++) {
-			System.out.print(solution.toString());
-			System.out.println(" ");
+		else {
+			System.out.println("NO.");
 		}
-		System.out.print("\n");
 	}
 
 }

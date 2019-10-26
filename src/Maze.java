@@ -1,113 +1,84 @@
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.*;
 
 public class Maze {
 	
 	private Box[][] maze;
 	
-	private ArrayList<ArrayList<Box>> roads;
+	int[] posibleY = {1, -1, 0, 0, -1, -1, 1, 1};
+	
+	int[] posibleX = {0, 0, -1, 1, -1, 1, -1, 1};
+	
+	int size;
+		
+	public Queue<Box> path = new LinkedList<Box>();
+	public Queue<Box> queue = new LinkedList<Box>();
+	
+	private ArrayList<Box> sol;
+	
+	public int length;
 	
 	public Maze(Box[][] maze) {
 		this.maze = maze;
-		this.roads = new ArrayList<>();
+		this.sol = new ArrayList<>();
+		this.length = maze.length;
 	}
 
-	public Box getBoxAt(int x, int y) {
-		if(isInBounds(x,y)) return maze[x][y];
+	public Box getBoxAt(int i, int j) {
+		if(isInBounds(i,j)) return maze[i][j];
 		else return null;
 		
-	}
-
-	public void addRoad(ArrayList<Box> road) {
-		roads.add(road);
 	}
 	
 	public boolean isInBounds(int i, int j) {
 		return(i >= 0 && i < this.maze.length && j >= 0 && j < this.maze.length);
 	}
-
-	public boolean canGoUp(Box actualBox, Box destinyBox) {
-		if(destinyBox != null && !destinyBox.isVisited())
-			return actualBox.upAvaliable();
-		
-		return false;
-	}
-
-	public boolean canGoDown(Box actualBox, Box destinyBox) {
-		if(destinyBox != null && !destinyBox.isVisited())
-			return actualBox.downAvaliable();
-		
-		return false;
-	}
-
-	public boolean canGoLeft(Box actualBox, Box destinyBox) {
-		if(destinyBox != null && !destinyBox.isVisited())
-			return actualBox.leftAvaliable();
-		
-		return false;
-	}
-
-	public boolean canGoRight(Box actualBox, Box destinyBox) {
-		if(destinyBox != null && !destinyBox.isVisited())
-			return actualBox.rightAvaliable();
-		
-		return false;
-	}
-
-	public boolean canGoUpLeft(Box actualBox, Box destinyBox) {
-		if(destinyBox != null && !destinyBox.isVisited())
-			return actualBox.upLeftAvaliable();
-		
-		return false;
-	}
-
-	public boolean canGoUpRight(Box actualBox, Box destinyBox) {
-		if(destinyBox != null && !destinyBox.isVisited())
-			return actualBox.upRightAvaliable();
-		
-		return false;
-	}
-
-	public boolean canGoDownLeft(Box actualBox, Box destinyBox) {
-		if(destinyBox != null && !destinyBox.isVisited())
-			return actualBox.downLeftAvaliable();
-		
-		return false;
-	}
-
-	public boolean canGoDownRight(Box actualBox, Box destinyBox) {
-		if(destinyBox != null && !destinyBox.isVisited())
-			return actualBox.downRightAvaliable();
-		
-		return false;
-	}
 	
-	public Box[][] getMaze() {
-		return maze;
+	public boolean isInBounds(Box box) {
+		return(box.getI() >= 0 && box.getI() < this.maze.length && box.getJ() >= 0 && box.getJ() < this.maze.length);
 	}
 
-	public void setMaze(Box[][] maze) {
-		this.maze = maze;
-	}
-
-	public ArrayList<ArrayList<Box>> getRoads() {
-		return roads;
-	}
-
-	public void setRoads(ArrayList<ArrayList<Box>> roads) {
-		this.roads = roads;
-	}
-
-	public Box[] getShortestRoad() {
-		int min = Integer.MAX_VALUE;
-		Box[] result = null;
-		for (int i = 0; i < roads.size(); i++) {
-			if(min > roads.get(i).size()) {
-				min = roads.get(i).size();
-				result = roads.get(i).toArray(new Box[roads.get(i).size()]);
-				System.out.println("Nuevo resultado optimo (" +min+ ") en " +i);
-			}
+	public Box[] getSol() {
+		if(sol.isEmpty()) {
+			return null;
 		}
-		return result;
+		else {
+			return null;
+		}
+	}
+
+
+	public boolean resolveMaze(Box startBox, Box endBox) {
+		queue.clear();
+		path.clear();
+		boolean exit = false;
+		boolean hasSolution = false;
+		Box actualBox;
+		System.out.println("A resolver desde [" +startBox.getI()+ "][" +startBox.getJ()+ "] hasta [" +endBox.getI()+ "][" +endBox.getJ()+ "]");
+		queue.add(startBox);
+		while(!queue.isEmpty() && !exit) {
+			actualBox = queue.remove();
+			System.out.println("Checkeo el [" +actualBox.getI()+ "][" +actualBox.getJ()+ "]");
+			if(actualBox.equals(endBox)) {
+				exit = true;
+				hasSolution = true;
+				System.out.println("Is the end");
+			}
+			System.out.println("No es el final");
+			actualBox.setVisited(true);
+			for (int i = 0; i < posibleX.length; i++) {
+				if(isInBounds(actualBox.getI() + posibleY[i], actualBox.getJ() + posibleX[i])) {
+					if(getBoxAt(actualBox.getI() + posibleY[i], actualBox.getJ() + posibleX[i]).getValue() != 1 && !(getBoxAt(actualBox.getI() + posibleY[i], actualBox.getJ() + posibleX[i]).isVisited())) {
+					queue.add(getBoxAt(actualBox.getI() + posibleY[i], actualBox.getJ() + posibleX[i]));
+					System.out.println("Añado el [" + (actualBox.getI() + posibleY[i]) + "][" + (actualBox.getJ() + posibleX[i]) + "]");
+					}
+				}
+			}
+			System.out.println("Visitado el [" +actualBox.getI()+ "][" +actualBox.getJ()+ "]");
+			
+		}
+		return hasSolution;
 	}
 
 }
