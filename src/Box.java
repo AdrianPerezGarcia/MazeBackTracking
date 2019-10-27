@@ -58,5 +58,9 @@ public class Box {
 		this.prize = prize;
 	}
 	
+	@Override
+	public String toString() {
+		return("(" +(this.i+1)+ "," +(this.j+1)+ ")");
+	}
 	
 }
